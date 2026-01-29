@@ -6,11 +6,23 @@ import { usePathname } from "next/navigation";
 export default function Sidebar() {
   const pathname = usePathname();
 
+  const user = {
+    name: "Leslie Alex",
+    role:  "admin",
+  }
+
   const menu = [
     { name: "Home", href: "/" },
     { name: "Chat", href: "/chatpage" },
     { name: "Document", href: "/leave" },
   ];
+  const adminMenu = [
+  { name: "Dashboard", href: "/admin" },
+  { name: "Users", href: "/admin/users" },
+  { name: "Leave Requests", href: "/admin/leaveRq" },
+];
+
+  const menus = user.role === 'admin' ? adminMenu : menu;
 
   return (
     <aside className="w-64 min-h-screen p-6
@@ -24,7 +36,7 @@ export default function Sidebar() {
       </h2>
 
       <nav className="space-y-4">
-        {menu.map((item) => {
+        {menus.map((item) => {
           const active = pathname === item.href;
 
           return (
