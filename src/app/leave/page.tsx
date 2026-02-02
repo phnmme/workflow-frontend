@@ -1,132 +1,115 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import api from "@/services/api";
+import Link from "next/link";
 
-export default function Page() {
-  const today = new Date();
-  const [current, setCurrent] = useState(new Date());
+type LeaveType = {
+  _id: string;
+  leaveName: string;
+  limitDays: number;
+  detail: string;
+  isActive: boolean;
+};
 
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [total, setTotal] = useState("");
 
-  const year = current.getFullYear();
-  const month = current.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
+type Leave = {
+  _id: string;
+  leaveTypeID: LeaveType;   // ⬅ ไม่ใช่ string แล้ว
+  start_date: string;
+  end_date: string;
+  status: string;
+};
 
-  const prevMonth = () => setCurrent(new Date(year, month - 1, 1));
-  const nextMonth = () => setCurrent(new Date(year, month + 1, 1));
+
+
+export default function MyLeaves() {
+  const [leaves, setLeaves] = useState<Leave[]>([]);
+
+
+
+  useEffect(() => {
+    api.get("/getMyRequest").then(res => {
+      setLeaves(res.data || []);
+    });
+
+  }, []);
+
+  const cancel = async (id: string) => {
+    if (!confirm("Cancel this request?")) return;
+
+    await api.post(`/${id}/cancelRequest`);
+
+  };
 
   return (
-    <div className="min-h-screen rounded-2xl w-full bg-linear-to-br from-[#9cc9ff] to-[#4c6b8a] p-10">
-      {/* Header */}
-      <div className="flex justify-between items-center text-white mb-10">
-        <h1 className="text-2xl font-semibold">Document</h1>
-        
+    <div className="p-10 min-h-screen bg-sky-200">
+      <div className="flex justify-between mb-6">
+        <h1 className="text-3xl font-bold">My Leave Requests</h1>
+        <Link
+          href="/leave/request"
+          className="px-4 py-2 rounded-xl bg-blue-500 text-white"
+        >
+          + Request Leave
+        </Link>
       </div>
 
-      <div className="flex gap-10">
+      <div className="bg-white rounded-xl overflow-hidden shadow">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-100">
+            <tr>
+              <th className="p-4">Type</th>
+              <th className="p-4">Date</th>
+              <th className="p-4">Status</th>
+              <th className="p-4"></th>
+            </tr>
+          </thead>
 
-        {/* FORM */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-85">
-          <h2 className="text-lg font-semibold mb-6">Leave request form</h2>
+          <tbody>
+            {leaves.map((l) => (
+              <tr key={l._id} className="border-t">
+                <td className="p-4">{l.leaveTypeID?.leaveName}</td>
 
-          <div className="space-y-4 text-sm ">
-            <div >
-              <label className="block  mb-1 text-gray-500 ">Leave type</label>
-              <select className="w-full border rounded-md bg-gray-100 px-3 py-2 p outline-none ">
-                <option>Sick Leave</option>
-                <option>Leave of absence</option>
-              </select>
-            </div>
+                <td className="p-4">
+                  {new Date(l.start_date).toLocaleDateString()} →{" "}
+                  {new Date(l.end_date).toLocaleDateString()}
+                </td>
 
-            <div>
-              <label className="block mb-1  text-gray-500">Reason</label>
-              <textarea className="w-full border rounded-md bg-gray-100 px-3 py-2 h-20 resize-none outline-none" />
-            </div>
+                <td className="p-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold
+                    ${l.status === "PENDING"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : l.status === "APPROVED"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                  >
+                    {l.status}
+                  </span>
+                </td>
 
-            {/* Start date */}
-            <div>
-              <label className="block mb-1 text-gray-500">Start date</label>
-              <div className="relative border rounded">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full rounded-md bg-gray-100 px-3 py-2 pr-10 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* End date */}
-            <div>
-              <label className="block mb-1 text-gray-500">End date</label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full border rounded-md bg-gray-100 px-3 py-2 pr-10 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Total (manual) */}
-            <div>
-              <label className="block mb-1 text-gray-500">Total</label>
-              <input
-                value={total}
-                onChange={(e) => setTotal(e.target.value)}
-                placeholder="Enter days"
-                className="w-full border rounded-md bg-gray-100 px-3 py-2 outline-none"
-              />
-            </div>
-
-            <button className="w-full bg-gray-300 hover:bg-gray-400 transition rounded-lg py-2 mt-4 text-gray-700">
-              Submit
-            </button>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-[320px]">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-semibold">
-              {current.toLocaleString("default", { month: "long" })} {year}
-            </h2>
-            <div className="flex gap-4 text-gray-400 text-xl">
-              <button onClick={prevMonth}>‹</button>
-              <button onClick={nextMonth}>›</button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-7 text-center text-sm gap-y-3">
-            {["Mo","Tu","We","Th","Fr","Sa","Su"].map(d => (
-              <div key={d} className="text-gray-400">{d}</div>
+                <td className="p-4">
+                  {l.status === "PENDING" && (
+                    <button
+                      onClick={() => cancel(l._id)}
+                      className="text-red-500 hover:underline"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </td>
+              </tr>
             ))}
 
-            {Array.from({ length: (firstDay + 6) % 7 }).map((_, i) => (
-              <div key={"e" + i} />
-            ))}
-
-            {Array.from({ length: daysInMonth }).map((_, i) => {
-              const date = new Date(year, month, i + 1);
-              const isToday = date.toDateString() === today.toDateString();
-
-              return (
-                <div
-                  key={i}
-                  className={`
-                    w-9 h-9 flex items-center justify-center rounded-full
-                    ${isToday ? "bg-blue-400 text-white" : "text-gray-700"}
-                  `}
-                >
-                  {i + 1}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
+            {leaves.length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-6 text-center text-gray-500">
+                  No leave requests yet
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
