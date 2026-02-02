@@ -14,7 +14,7 @@ type LeaveType = {
 
 type Leave = {
   _id: string;
-  leaveTypeID: LeaveType;   // ⬅ ไม่ใช่ string แล้ว
+  leaveTypeID: LeaveType;   
   start_date: string;
   end_date: string;
   status: string;

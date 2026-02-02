@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 
-/* ================= TYPES ================= */
 
 type User = {
   _id: string;
@@ -20,8 +19,8 @@ type LeaveType = {
 
 type RawLeaveRequest = {
   _id: string;
-  userId: string;        // ObjectId
-  leaveTypeID: string;  // ObjectId
+  userId: string;        
+  leaveTypeID: string;  
   start_date: string;
   end_date: string;
   days: number;
@@ -40,7 +39,7 @@ type LeaveRequest = {
   status: "PENDING" | "APPROVED" | "CANCELLED";
 };
 
-/* ================= COMPONENT ================= */
+
 
 export default function AdminLeaves() {
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
@@ -48,19 +47,19 @@ export default function AdminLeaves() {
 
   const load = async () => {
     try {
-      // 1) ดึงข้อมูลดิบ
+      
       const leaveRes = await api.get("/getAllRequest");
       const rawLeaves: RawLeaveRequest[] = leaveRes.data.data;
 
-      // 2) ดึง users ทั้งหมด
-      const userRes = await api.get("/admin/users"); // ต้องมี endpoint นี้
+      
+      const userRes = await api.get("/admin/users"); 
       const users: User[] = userRes.data.data;
 
-      // 3) ดึง leave types
-      const typeRes = await api.get("/getLeaveTypes"); // ต้องมี endpoint นี้
+      
+      const typeRes = await api.get("/getLeaveTypes"); 
       const leaveTypes: LeaveType[] = typeRes.data.data;
 
-      // 4) Map ObjectId → object
+      
       const mapped: LeaveRequest[] = rawLeaves.map((l) => ({
         _id: l._id,
         start_date: l.start_date,
