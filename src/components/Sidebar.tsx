@@ -2,19 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LogoutButton from "./LogoutButt";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   const user = {
     name: "Leslie Alex",
-    role:  "admin",
+    role:  "user",
   }
 
   const menu = [
     { name: "Home", href: "/" },
     { name: "Chat", href: "/chatpage" },
     { name: "Document", href: "/leave" },
+    { name: "Change-Password", href: "/changepassword" },
+
   ];
   const adminMenu = [
   { name: "Dashboard", href: "/admin" },
@@ -57,6 +60,8 @@ export default function Sidebar() {
           );
         })}
       </nav>
+        <LogoutButton/>
     </aside>
+    
   );
 }

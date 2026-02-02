@@ -1,22 +1,31 @@
 import axios from "axios";
 
-export async function loginAction(username: string, password: string) {
+interface LoginResponse {
+  success: boolean;
+  token?: string;
+  message?: string;
+}
+
+export async function loginAction(
+  username: string,
+  password: string
+): Promise<LoginResponse> {
   const host = process.env.NEXT_PUBLIC_HOST_URL;
 
   try {
-    const response = await axios.post(`${host}/s/v1/login`, {
+    const res = await axios.post(`${host}s/v1/login`, {
       username,
       password,
     });
 
-    if (response.status !== 200) {
-      throw new Error("Login failed");
-    }
-    const data = response.data;
-    localStorage.setItem("token", data.token);
-    return data;
-  } catch (error) {
-    console.error("Error during login:", error);
-    throw error;
+    return {
+      success: true,
+      token: res.data.token, // 👈 ชัดเจน
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || "Login failed",
+    };
   }
 }
