@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import api from '@/libs/api';
+import React, { useState, useEffect } from "react";
+import api from "@/libs/api";
 interface AttendanceRecord {
   date: string;
   day: string;
@@ -14,7 +14,9 @@ interface AttendanceRecord {
 
 const ClockInOutPage: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
-  const [attendanceHistory, setAttendanceHistory] = useState<AttendanceRecord[]>([]);
+  const [attendanceHistory, setAttendanceHistory] = useState<
+    AttendanceRecord[]
+  >([]);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -41,13 +43,11 @@ const ClockInOutPage: React.FC = () => {
               item.checkInTime && item.checkOutTime
                 ? "ทำงานแล้ว"
                 : item.status === "present"
-                  ? "มาแล้ว"
-                  : "-",
+                ? "มาแล้ว"
+                : "-",
             status: item.status, // 👈 ตรงนี้
           };
         });
-
-
 
         console.log("FORMATTED RESULT:", formatted);
 
@@ -57,9 +57,7 @@ const ClockInOutPage: React.FC = () => {
       }
     };
 
-
     fetchHistory();
-
   }, []);
 
   const formatTime = (date?: string | Date | null) => {
@@ -78,10 +76,6 @@ const ClockInOutPage: React.FC = () => {
     return time?.slice(0, 5) ?? "-";
   };
 
-
-
-
-
   useEffect(() => {
     setCurrentTime(new Date());
 
@@ -94,12 +88,9 @@ const ClockInOutPage: React.FC = () => {
 
   if (!currentTime) return null;
 
-
-
   const handleClockIn = async () => {
     try {
       const res = await api.post("/attendance/check-in");
-      //  http://localhost:4000/attendance/check-in
       alert(res.data.message);
       window.location.reload(); // ง่ายสุด (หรือ refetch)
     } catch (err: any) {
@@ -117,13 +108,14 @@ const ClockInOutPage: React.FC = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen  py-12 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Title */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-black mb-2">Clock in / Clock out</h1>
+          <h1 className="text-4xl font-bold text-black mb-2">
+            Clock in / Clock out
+          </h1>
           <p className="text-sm text-gray-600">บันทึกเวลาเข้างานของคุณ</p>
         </div>
 
@@ -132,7 +124,13 @@ const ClockInOutPage: React.FC = () => {
           {/* Clock In Card */}
           <div className="bg-white rounded-3xl shadow-xl p-8">
             <div className="flex items-center gap-3 mb-6">
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                className="w-8 h-8"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
@@ -140,7 +138,9 @@ const ClockInOutPage: React.FC = () => {
             </div>
 
             <div className="text-center mb-8">
-              <div className="text-5xl font-bold text-[#5B9FED] mb-3">{formatTime(currentTime)}</div>
+              <div className="text-5xl font-bold text-[#5B9FED] mb-3">
+                {formatTime(currentTime)}
+              </div>
               <p className="text-sm text-gray-500">
                 {currentTime.toLocaleDateString("th-TH", {
                   weekday: "long",
@@ -149,7 +149,6 @@ const ClockInOutPage: React.FC = () => {
                   year: "numeric",
                 })}
               </p>
-
             </div>
 
             <div className="mb-6">
@@ -158,8 +157,10 @@ const ClockInOutPage: React.FC = () => {
               </div>
             </div>
 
-            <button className="w-full bg-[#4ADE80] hover:bg-[#3CCE70] text-white font-semibold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
-              onClick={handleClockIn}>
+            <button
+              className="w-full bg-[#4ADE80] hover:bg-[#3CCE70] text-white font-semibold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+              onClick={handleClockIn}
+            >
               Clock in
             </button>
           </div>
@@ -167,7 +168,13 @@ const ClockInOutPage: React.FC = () => {
           {/* Clock Out Card */}
           <div className="bg-white rounded-3xl shadow-xl p-8">
             <div className="flex items-center gap-3 mb-6">
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                className="w-8 h-8"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
@@ -175,7 +182,9 @@ const ClockInOutPage: React.FC = () => {
             </div>
 
             <div className="text-center mb-8">
-              <div className="text-5xl font-bold text-[#5B9FED] mb-3">{formatTime(currentTime)}</div>
+              <div className="text-5xl font-bold text-[#5B9FED] mb-3">
+                {formatTime(currentTime)}
+              </div>
               <p className="text-sm text-gray-500">
                 {currentTime.toLocaleDateString("th-TH", {
                   weekday: "long",
@@ -192,8 +201,10 @@ const ClockInOutPage: React.FC = () => {
               </div>
             </div>
 
-            <button className="w-full bg-[#FBBF24] hover:bg-[#F59E0B] text-white font-semibold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
-              onClick={handleClockOut}>
+            <button
+              className="w-full bg-[#FBBF24] hover:bg-[#F59E0B] text-white font-semibold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+              onClick={handleClockOut}
+            >
               Clock out
             </button>
           </div>
@@ -201,7 +212,9 @@ const ClockInOutPage: React.FC = () => {
 
         {/* Attendance History */}
         <div className="bg-white rounded-3xl shadow-xl p-8">
-          <h3 className="text-2xl font-bold text-black mb-6">Attendance History</h3>
+          <h3 className="text-2xl font-bold text-black mb-6">
+            Attendance History
+          </h3>
 
           <div className="space-y-3">
             {attendanceHistory.map((record, index) => (
@@ -212,8 +225,12 @@ const ClockInOutPage: React.FC = () => {
                 <div className="flex items-center gap-5">
                   {/* Date */}
                   <div className="flex flex-col items-center justify-center bg-white rounded-xl px-5 py-3 min-w-20 border border-gray-200">
-                    <div className="text-3xl font-bold text-[#5B9FED] leading-none">{record.date}</div>
-                    <div className="text-xs text-gray-500 mt-1">{record.day}</div>
+                    <div className="text-3xl font-bold text-[#5B9FED] leading-none">
+                      {record.date}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {record.day}
+                    </div>
                   </div>
 
                   {/* Clock Times */}
@@ -230,9 +247,18 @@ const ClockInOutPage: React.FC = () => {
                       <div className="ml-auto">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-semibold
-                            ${record.status === "late" && "bg-red-100 text-red-600"}
-                            ${record.status === "present" && "bg-green-100 text-green-600"}
-                            ${record.status === "absent" && "bg-gray-200 text-gray-600"}
+                            ${
+                              record.status === "late" &&
+                              "bg-red-100 text-red-600"
+                            }
+                            ${
+                              record.status === "present" &&
+                              "bg-green-100 text-green-600"
+                            }
+                            ${
+                              record.status === "absent" &&
+                              "bg-gray-200 text-gray-600"
+                            }
                           `}
                         >
                           {record.status === "late" && "มาสาย"}
@@ -240,14 +266,12 @@ const ClockInOutPage: React.FC = () => {
                           {record.status === "absent" && "ขาด"}
                         </span>
                       </div>
-
                     </div>
                   ) : (
                     <div className="flex-1 text-sm text-gray-400">
                       ยังไม่ clock in
                     </div>
                   )}
-
                 </div>
               </div>
             ))}

@@ -1,77 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "@/services/api";
-
-
-type User = {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-};
-
-type LeaveType = {
-  _id: string;
-  leaveName: string;
-  limitDays: number;
-};
-
-type RawLeaveRequest = {
-  _id: string;
-  userId: string;        
-  leaveTypeID: string;  
-  start_date: string;
-  end_date: string;
-  days: number;
-  reason: string;
-  status: "PENDING" | "APPROVED" | "CANCELLED";
-};
-
-type LeaveRequest = {
-  _id: string;
-  user: User | null;
-  leaveType: LeaveType | null;
-  start_date: string;
-  end_date: string;
-  days: number;
-  reason: string;
-  status: "PENDING" | "APPROVED" | "CANCELLED";
-};
-
-
+import axios from "axios";
 
 export default function AdminLeaves() {
-  const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
+  const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    console.log("leaves:", leaves);
+  }, [leaves]);
 
   const load = async () => {
     try {
-      
-      const leaveRes = await api.get("/getAllRequest");
-      const rawLeaves: RawLeaveRequest[] = leaveRes.data.data;
-
-      
-      const userRes = await api.get("/admin/users"); 
-      const users: User[] = userRes.data.data;
-
-      
-      const typeRes = await api.get("/getLeaveTypes"); 
-      const leaveTypes: LeaveType[] = typeRes.data.data;
-
-      
-      const mapped: LeaveRequest[] = rawLeaves.map((l) => ({
-        _id: l._id,
-        start_date: l.start_date,
-        end_date: l.end_date,
-        days: l.days,
-        reason: l.reason,
-        status: l.status,
-        user: users.find((u) => u._id === l.userId) || null,
-        leaveType: leaveTypes.find((t) => t._id === l.leaveTypeID) || null,
-      }));
-
-      setLeaves(mapped);
+      const leaveRes = await axios.get(
+        `${process.env.NEXT_PUBLIC_HOST_URL}/getAllRequest`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("leaveRes.data:", leaveRes.data);
+      setLeaves(leaveRes.data);
     } catch (err) {
       console.error("Load leave error:", err);
     } finally {
@@ -84,10 +34,18 @@ export default function AdminLeaves() {
   }, []);
 
   const changeStatus = async (
-    id: string,
+    requestID: string,
     status: "APPROVED" | "CANCELLED"
   ) => {
-    await api.patch(`/${id}/changeStatus`, { status });
+    await axios.patch(
+      `${process.env.NEXT_PUBLIC_HOST_URL}/${requestID}/changeStatus`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
     load();
   };
 
@@ -95,9 +53,7 @@ export default function AdminLeaves() {
 
   return (
     <div className="p-10 min-h-screen bg-white/20 backdrop-blur">
-      <h1 className="text-3xl font-bold text-white mb-6">
-        Leave Requests
-      </h1>
+      <h1 className="text-3xl font-bold text-white mb-6">Leave Requests</h1>
 
       <div className="bg-white/80 rounded-xl overflow-hidden shadow-lg">
         <table className="w-full text-sm">
@@ -116,15 +72,9 @@ export default function AdminLeaves() {
           <tbody>
             {leaves.map((l) => (
               <tr key={l._id} className="border-t">
-                <td className="p-4">
-                  {l.user
-                    ? `${l.user.firstName} ${l.user.lastName}`
-                    : "Unknown"}
-                </td>
+                <td className="p-4">{l.userId ? l.userId : "Deleted User"}</td>
 
-                <td className="p-4">
-                  {l.leaveType?.leaveName || "Unknown"}
-                </td>
+                <td className="p-4">{l?.leaveType || "Unknown"}</td>
 
                 <td className="p-4">
                   {new Date(l.start_date).toLocaleDateString()} →{" "}

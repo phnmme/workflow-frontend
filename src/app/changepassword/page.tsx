@@ -15,7 +15,7 @@ const ChangePasswordPage: React.FC = () => {
     e.preventDefault();
 
     try {
-      const res = await api.post("s/v1/change-password", {
+      const res = await api.post("/change-password", {
         username,
         oldPassword: currentPassword,
         newPassword,
@@ -25,13 +25,10 @@ const ChangePasswordPage: React.FC = () => {
     } catch (err: any) {
       console.error(err);
 
-      const msg =
-        err?.response?.data?.message || "Change password failed";
+      const msg = err?.response?.data?.message || "Change password failed";
       alert(msg);
     }
   };
-
-
 
   const EyeIcon: React.FC<{ show: boolean }> = ({ show }) => (
     <svg

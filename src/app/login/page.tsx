@@ -10,7 +10,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
 
   const router = useRouter();
-  
+
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -20,15 +20,12 @@ const LoginPage = () => {
     if (result.success && result.token) {
       document.cookie = `token=${result.token}; path=/`;
       localStorage.setItem("token", result.token);
+
       router.replace("/");
     } else {
       setError(result.message ?? "Login failed");
     }
-
   };
-
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center p-5">
@@ -150,6 +147,7 @@ const LoginPage = () => {
           {/* Confirm Button */}
           <button
             type="submit"
+            onClick={submitHandler}
             className="w-full bg-[#5B9FED] hover:bg-[#4A8FDD] text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all active:translate-y-0.5"
           >
             Confirm

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import api from "@/services/api";
 import Link from "next/link";
+import axios from "axios";
 
 type LeaveType = {
   _id: string;
@@ -11,34 +11,48 @@ type LeaveType = {
   isActive: boolean;
 };
 
-
 type Leave = {
   _id: string;
-  leaveTypeID: LeaveType;   
+  leaveTypeID: LeaveType;
   start_date: string;
   end_date: string;
   status: string;
 };
 
-
-
 export default function MyLeaves() {
   const [leaves, setLeaves] = useState<Leave[]>([]);
 
-
-
   useEffect(() => {
-    api.get("/getMyRequest").then(res => {
-      setLeaves(res.data || []);
-    });
+    const getMyRequest = async () => {
+      try {
+        const host = process.env.NEXT_PUBLIC_HOST_URL;
+        const token = localStorage.getItem("token");
 
+        const res = await axios.get(`${host}/getMyRequest`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLeaves(res.data);
+      } catch (err) {
+        console.error("Error fetching leave requests:", err);
+      }
+    };
+
+    getMyRequest();
   }, []);
 
   const cancel = async (id: string) => {
     if (!confirm("Cancel this request?")) return;
 
-    await api.post(`/${id}/cancelRequest`);
-
+    try {
+      const host = process.env.NEXT_PUBLIC_HOST_URL;
+      const token = localStorage.getItem("token");
+      await axios.post(`${host}/${id}/cancelRequest`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLeaves((prev) => prev.filter((l) => l._id !== id));
+    } catch (err) {
+      console.error("Error cancelling leave request:", err);
+    }
   };
 
   return (
@@ -77,12 +91,13 @@ export default function MyLeaves() {
                 <td className="p-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold
-                    ${l.status === "PENDING"
+                    ${
+                      l.status === "PENDING"
                         ? "bg-yellow-100 text-yellow-700"
                         : l.status === "APPROVED"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
                   >
                     {l.status}
                   </span>
@@ -91,7 +106,10 @@ export default function MyLeaves() {
                 <td className="p-4">
                   {l.status === "PENDING" && (
                     <button
-                      onClick={() => cancel(l._id)}
+                      onClick={() => {
+                        console.log("Cancel", l._id);
+                        cancel(l._id);
+                      }}
                       className="text-red-500 hover:underline"
                     >
                       Cancel

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "@/services/api";
+import axios from "axios";
 import Link from "next/link";
 
 type User = {
@@ -25,11 +25,14 @@ export default function UsersPage() {
   useEffect(() => {
     const now = new Date();
 
-    api
-      .get("/log/summary/all", {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_HOST_URL}/log/summary/all`, {
         params: {
           year: now.getFullYear(),
           month: now.getMonth() + 1,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
       .then((res) => {
@@ -42,15 +45,15 @@ export default function UsersPage() {
   }, []);
 
   return (
-    <div className="min-h-screen p-10 rounded-2xl bg-gradient-to-br bg-white/20 backdrop-blur-xl
+    <div
+      className="min-h-screen p-10 rounded-2xl bg-gradient-to-br bg-white/20 backdrop-blur-xl
         border border-white/20
-        shadow-xl">
+        shadow-xl"
+    >
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-800">Users</h1>
-        <p className="text-slate-500 mt-1">
-          Overview of employee attendance
-        </p>
+        <p className="text-slate-500 mt-1">Overview of employee attendance</p>
       </div>
 
       {/* Table Container */}
@@ -76,7 +79,7 @@ export default function UsersPage() {
                 <th className="p-4 text-center">Late</th>
                 <th className="p-4 text-center">Leave</th>
                 <th className="p-4 text-center">Total</th>
-                <th className="p-4 text-center">Action</th>
+                {/* <th className="p-4 text-center">Action</th> */}
               </tr>
             </thead>
 
@@ -105,7 +108,7 @@ export default function UsersPage() {
                     {u.total}
                   </td>
 
-                  <td className="p-4 text-center">
+                  {/* <td className="p-4 text-center">
                     <Link
                       href={`/admin/users/${u.userId}`}
                       className="
@@ -119,16 +122,13 @@ export default function UsersPage() {
                     >
                       View
                     </Link>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
 
               {users.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={8}
-                    className="p-10 text-center text-slate-400"
-                  >
+                  <td colSpan={8} className="p-10 text-center text-slate-400">
                     No users found
                   </td>
                 </tr>
