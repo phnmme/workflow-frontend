@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LogoutButton from "./LogoutButt";
 import { useEffect, useState } from "react";
 
 type Role = "user" | "admin";
@@ -34,6 +35,10 @@ function getRoleFromToken(): Role {
 export default function Sidebar() {
   const pathname = usePathname();
 
+  const user = {
+    name: "Leslie Alex",
+    role:  "user",
+  }
   const [role, setRole] = useState<Role>("user");
 
   useEffect(() => {
@@ -44,6 +49,9 @@ export default function Sidebar() {
   const userMenu = [
     { name: "Home", href: "/" },
     { name: "Chat", href: "/chatpage" },
+    { name: "Document", href: "/leave" },
+    { name: "Change-Password", href: "/changepassword" },
+
     { name: "Leave", href: "/leave" },
   ];
 
@@ -86,10 +94,12 @@ export default function Sidebar() {
           );
         })}
       </nav>
+        <LogoutButton/>
 
       <div className="mt-auto pt-8 border-t border-white/20 text-sm text-white/60">
         {role === "admin" ? "Admin Mode" : "User Mode"}
       </div>
     </aside>
+    
   );
 }

@@ -1,20 +1,38 @@
 "use client";
 import { loginAction } from "@/actions/action";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
+  const router = useRouter();
+  
   const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
     const result = await loginAction(username, password);
+
+    if (result.success && result.token) {
+      document.cookie = `token=${result.token}; path=/`;
+      localStorage.setItem("token", result.token);
+      router.replace("/");
+    } else {
+      setError(result.message ?? "Login failed");
+    }
+
   };
 
+
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#87CEEB] via-[#6BA8D8] to-[#5E8DB8] flex items-center justify-center p-5">
-      <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-[420px] text-center">
+    <div className="min-h-screen flex items-center justify-center p-5">
+      <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-105 text-center">
         {/* Chat Icon */}
         <div className="w-14 h-14 mx-auto mb-5">
           <svg
@@ -47,7 +65,7 @@ const LoginPage = () => {
         </p>
 
         {/* Form */}
-        <form className="space-y-4">
+        <form className="space-y-4" autoComplete="off" onSubmit={submitHandler}>
           {/* Username Field */}
           <div className="text-left">
             <label
@@ -61,7 +79,7 @@ const LoginPage = () => {
                 type="text"
                 id="username"
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Chutiwat"
+                placeholder="Chutawat"
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-black focus:outline-none focus:bg-white focus:border-blue-300 transition-all placeholder:text-gray-400"
               />
             </div>
@@ -122,7 +140,7 @@ const LoginPage = () => {
           {/* Change Password Link */}
           <div className="text-right pt-1 pb-4">
             <a
-              href="#"
+              href="/changepassword"
               className="text-xs text-[#5B9FED] hover:text-[#4A8FDD] transition-colors"
             >
               Change password ?
@@ -132,7 +150,6 @@ const LoginPage = () => {
           {/* Confirm Button */}
           <button
             type="submit"
-            onClick={submitHandler}
             className="w-full bg-[#5B9FED] hover:bg-[#4A8FDD] text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all active:translate-y-0.5"
           >
             Confirm
